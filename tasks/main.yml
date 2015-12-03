@@ -2,8 +2,25 @@
 - include: setup-RedHat.yml
   when: ansible_os_family == "RedHat"
 
+- name: Ensure InfluxDB config dirs exists.
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ influxdb_user }}"
+    group: "{{ influxdb_group }}"
+  with_items:
+    - "{{ influxdb_config_meta_dir }}"
+    - "{{ influxdb_config_data_dir }}"
+    - "{{ influxdb_config_wal_dir }}"
+    - "{{ influxdb_config_hh_dir }}"
+  when: influxdb_config_use_template
+
 - name: Ensure InfluxDB config path exists.
-  file: path={{ influxdb_config_path }} state=directory
+  file:
+    path: "{{ influxdb_config_path }}"
+    state: directory
+    owner: root
+    group: root
   when: influxdb_config_use_template
 
 - name: Copy InfluxDB config.

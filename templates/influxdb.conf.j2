@@ -1,6 +1,47 @@
 # InfluxDB configuration file.
 
-{% for item in influxdb_config %}
+{% for item in influxdb_config_other %}
+{% if item is not mapping %}
+{{ item }}
+{% endif %}
+{% endfor %}
+
+###############################################################################
+#                                  META                                       #
+###############################################################################
+
+[meta]
+  dir = "{{ influxdb_config_meta_dir }}"
+{% for item in influxdb_config_meta %}
+  {{ item }}
+{% endfor %}
+
+###############################################################################
+#                                  DATA                                       #
+###############################################################################
+
+[data]
+  dir = "{{ influxdb_config_data_dir }}"
+  wal-dir = "{{ influxdb_config_wal_dir }}"
+{% for item in influxdb_config_data %}
+  {{ item }}
+{% endfor %}
+
+###############################################################################
+#                                  HH                                         #
+###############################################################################
+
+[hinted-handoff]
+  dir = "{{ influxdb_config_hh_dir }}"
+{% for item in influxdb_config_hh %}
+  {{ item }}
+{% endfor %}
+
+###############################################################################
+#                                  OTHER                                      #
+###############################################################################
+
+{% for item in influxdb_config_other %}
 {% if item is mapping %}
 [{{ item.section }}]
 {% if item.config is defined %}
@@ -8,8 +49,6 @@
   {{ item }}
 {% endfor %}
 {% endif %}
-{% else %}
-{{ item }}
-{% endif %}
 
+{% endif %}
 {% endfor %}
