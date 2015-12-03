@@ -1,0 +1,15 @@
+# InfluxDB configuration file.
+
+{% for item in influxdb_config %}
+{% if item is mapping %}
+[{{ item.section }}]
+{% if item.config is defined %}
+{% for item in item.config %}
+  {{ item }}
+{% endfor %}
+{% endif %}
+{% else %}
+{{ item }}
+{% endif %}
+
+{% endfor %}

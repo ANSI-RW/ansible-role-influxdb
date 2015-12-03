@@ -1,0 +1,3 @@
+---
+- name: Restart InfluxDB.
+  service: name=influxdb state=restarted

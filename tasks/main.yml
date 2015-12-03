@@ -1,0 +1,23 @@
+---
+- include: setup-RedHat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: Ensure InfluxDB config path exists.
+  file: path={{ influxdb_config_path }} state=directory
+  when: influxdb_config_use_template
+
+- name: Copy InfluxDB config.
+  template:
+    src: "{{ influxdb_config_template_path }}"
+    dest: "{{ influxdb_config_path }}/influxdb.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart influxdb
+  when: influxdb_config_use_template
+
+- name: Ensure InfluxDB is started.
+  service: name=influxdb state=started
+
+- name: Ensure InfluxDB is set to run on startup.
+  service: name=influxdb enabled=yes

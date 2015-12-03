@@ -1,0 +1,148 @@
+---
+# InfluxDB version
+influxdb_version: 0.9.5.1
+
+# Config path
+influxdb_config_path: /etc/influxdb
+influxdb_config_template_path: influxdb.conf.j2
+influxdb_config_use_template: true
+
+influxdb_config:
+  # Once every 24 hours InfluxDB will report anonymous data to m.influxdb.com
+  # The data includes raft id (random 8 bytes), os, arch, version, and
+  # metadata. We don't track ip addresses of servers reporting. This is only
+  # used to track the number of instances running and the versions, which is
+  # very helpful for us. Change this option to true to disable reporting.
+  - reporting-disabled = false
+  # Enterprise registration control
+  - section: registration
+    # config:
+    #   - enabled = true
+    #   - url = "https://enterprise.influxdata.com"
+    #   - token = ""
+  # Controls the parameters for the Raft consensus group that stores metadata
+  # about the InfluxDB cluster.
+  - section: meta
+    config:
+      - dir = "/var/lib/influxdb/meta"
+      - hostname = "localhost"
+      - bind-address = ":8088"
+      - retention-autocreate = true
+      - election-timeout = "1s"
+      - heartbeat-timeout = "1s"
+      - leader-lease-timeout = "500ms"
+      - commit-timeout = "50ms"
+      - cluster-tracing = false
+      # If enabled, when a Raft cluster loses a peer due to a `DROP SERVER`
+      # command, the leader will automatically ask a non-raft peer node to
+      # promote to a raft peer. This only happens if there is a non-raft peer
+      # node available to promote. This setting only affects the local node, so
+      # to ensure if operates correctly, be sure to set it in the config of
+      # every node.
+      - raft-promotion-enabled = true
+  - section: data
+    config:
+      - dir = "/var/lib/influxdb/data"
+      # The following WAL settings are for the b1 storage engine used in 0.9.2.
+      # They won't apply to any new shards created after upgrading to a
+      # version > 0.9.3.
+      - max-wal-size = 104857600 # Maximum size the WAL can reach before a flush. Defaults to 100MB.
+      - wal-flush-interval = "10m" # Maximum time data can sit in WAL before a flush.
+      - wal-partition-flush-delay = "2s" # The delay time between each WAL partition being flushed.
+      # These are the WAL settings for the storage engine >= 0.9.3
+      - wal-dir = "/var/lib/influxdb/wal"
+      - wal-enable-logging = true
+  # Controls the hinted handoff feature, which allows nodes to temporarily
+  # store queued data when one node of a cluster is down for a short period of
+  # time.
+  - section: hinted-handoff
+    config:
+      - enabled = true
+      - dir = "/var/lib/influxdb/hh"
+      - max-size = 1073741824
+      - max-age = "168h"
+      - retry-rate-limit = 0
+      # Hinted handoff will start retrying writes to down nodes at a rate of
+      # once per second. If any error occurs, it will backoff in an exponential
+      # manner, until the interval reaches retry-max-interval. Once writes to
+      # all nodes are successfully completed the interval will reset to
+      # retry-interval.
+      - retry-interval = "1s"
+      - retry-max-interval = "1m"
+      # Interval between running checks for data that should be purged. Data is
+      # purged from hinted-handoff queues for two reasons. 1) The data is older
+      # than the max age, or 2) the target node has been dropped from the
+      # cluster. Data is never dropped until it has reached max-age however,
+      # for a dropped node or not.
+      - purge-interval = "1h"
+  # Controls non-Raft cluster behavior, which generally includes how data is
+  # shared across shards.
+  - section: cluster
+    config:
+      - shard-writer-timeout = "10s" # The time within which a shard must respond to write.
+      - write-timeout = "5s" # The time within which a write operation must complete on the cluster.
+  # Controls the enforcement of retention policies for evicting old data.
+  - section: retention
+    config:
+      - enabled = true
+      - check-interval = "30m"
+  # Controls the precreation of shards, so they are created before data arrives.
+  # Only shards that will exist in the future, at time of creation, are
+  # precreated.
+  - section: shard-precreation
+    config:
+      - enabled = true
+      - check-interval = "10m"
+      - advance-period = "30m"
+  # Controls the system self-monitoring, statistics and diagnostics.
+  - section: monitor
+    config:
+      - store-enabled = true # Whether to record statistics internally.
+      - store-database = "_internal" # The destination database for recorded statistics
+      - store-interval = "10s" # The interval at which to record statistics
+  # Controls the availability of the built-in, web-based admin interface. If HTTPS
+  # is enabled for the admin interface, HTTPS must also be enabled on the [http]
+  # service.
+  - section: admin
+    config:
+      - enabled = true
+      - bind-address = ":8083"
+      - https-enabled = false
+      - https-certificate = "/etc/ssl/influxdb.pem"
+  # Controls how the HTTP endpoints are configured. These are the primary
+  # mechanism - for getting data into and out of InfluxDB.
+  - section: http
+    config:
+      - enabled = true
+      - bind-address = ":8086"
+      - auth-enabled = false
+      - log-enabled = true
+      - write-tracing = false
+      - pprof-enabled = false
+      - https-enabled = false
+      - https-certificate = "/etc/ssl/influxdb.pem"
+  # Controls one or many listeners for Graphite data.
+  - section: "[graphite]"
+    config:
+      - enabled = false
+  # Controls the listener for collectd data.
+  - section: collectd
+    config:
+      - enabled = false
+  # Controls the listener for OpenTSDB data.
+  - section: opentsdb
+    config:
+      - enabled = false
+  # Controls the listeners for InfluxDB line protocol data via UDP.
+  - section: "[udp]"
+    config:
+      - enabled = false
+  # Controls how continuous queries are run within InfluxDB.
+  - section: continuous_queries
+    config:
+      - log-enabled = true
+      - enabled = true
+      - recompute-previous-n = 2
+      - recompute-no-older-than = "10m"
+      - compute-runs-per-interval = 10
+      - compute-no-more-than = "2m"
