@@ -32,8 +32,5 @@
   notify: restart influxdb
   when: influxdb_config_use_template
 
-- name: Ensure InfluxDB is started.
-  service: name=influxdb state=started
-
-- name: Ensure InfluxDB is set to run on startup.
-  service: name=influxdb enabled=yes
+- name: Start and enable InfluxDB.
+  service: name=influxdb state=started enabled=yes
