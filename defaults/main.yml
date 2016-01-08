@@ -1,17 +1,13 @@
 ---
-# InfluxDB version
-influxdb_version: 0.9.5.1
+# Version that should be installed
+influxdb_version: 0.9.6.1
 
-# User/Group
-influxdb_user: influxdb
-influxdb_group: influxdb
-
-# Config path
-influxdb_config_path: /etc/influxdb
-influxdb_config_template_path: influxdb.conf.j2
+# Use the included config template
 influxdb_config_use_template: true
+# Where config files will be stored
+influxdb_config_path: /etc/influxdb
 
-# Meta section
+# Config [meta] section
 influxdb_config_meta_dir: /var/lib/influxdb/meta
 # Controls the parameters for the Raft consensus group that stores metadata
 # about the InfluxDB cluster.
@@ -25,14 +21,14 @@ influxdb_config_meta:
   - commit-timeout = "50ms"
   - cluster-tracing = false
   # If enabled, when a Raft cluster loses a peer due to a `DROP SERVER`
-  # command, the leader will automatically ask a non-raft peer node to
-  # promote to a raft peer. This only happens if there is a non-raft peer
-  # node available to promote. This setting only affects the local node, so
-  # to ensure if operates correctly, be sure to set it in the config of
-  # every node.
+  # command, the leader will automatically ask a non-raft peer node to promote
+  # to a raft peer. This only happens if there is a non-raft peer node
+  # available to promote. This setting only affects the local node, so to
+  # ensure if operates correctly, be sure to set it in the config of every
+  # node.
   - raft-promotion-enabled = true
 
-# Data section
+# Config [data] section
 influxdb_config_data_dir: /var/lib/influxdb/data
 influxdb_config_wal_dir: /var/lib/influxdb/wal
 # Controls where the actual shard data for InfluxDB lives and how it is flushed
@@ -43,12 +39,15 @@ influxdb_config_data:
   # The following WAL settings are for the b1 storage engine used in 0.9.2.
   # They won't apply to any new shards created after upgrading to a
   # version > 0.9.3.
-  - max-wal-size = 104857600 # Maximum size the WAL can reach before a flush. Defaults to 100MB.
-  - wal-flush-interval = "10m" # Maximum time data can sit in WAL before a flush.
-  - wal-partition-flush-delay = "2s" # The delay time between each WAL partition being flushed.
+  # Maximum size the WAL can reach before a flush. Defaults to 100MB.
+  - max-wal-size = 104857600
+  # Maximum time data can sit in WAL before a flush.
+  - wal-flush-interval = "10m"
+  # The delay time between each WAL partition being flushed.
+  - wal-partition-flush-delay = "2s"
   - wal-enable-logging = true
 
-# Hinted-handoff section
+# Config [hinted-handoff] section
 influxdb_config_hh_dir: /var/lib/influxdb/hh
 # Controls the hinted handoff feature, which allows nodes to temporarily store
 # queued data when one node of a cluster is down for a short period of time.
@@ -57,21 +56,20 @@ influxdb_config_hh:
   - max-size = 1073741824
   - max-age = "168h"
   - retry-rate-limit = 0
-  # Hinted handoff will start retrying writes to down nodes at a rate of
-  # once per second. If any error occurs, it will backoff in an exponential
-  # manner, until the interval reaches retry-max-interval. Once writes to
-  # all nodes are successfully completed the interval will reset to
-  # retry-interval.
+  # Hinted handoff will start retrying writes to down nodes at a rate of once
+  # per second. If any error occurs, it will backoff in an exponential manner,
+  # until the interval reaches retry-max-interval. Once writes to all nodes are
+  # successfully completed the interval will reset to retry-interval.
   - retry-interval = "1s"
   - retry-max-interval = "1m"
   # Interval between running checks for data that should be purged. Data is
   # purged from hinted-handoff queues for two reasons. 1) The data is older
-  # than the max age, or 2) the target node has been dropped from the
-  # cluster. Data is never dropped until it has reached max-age however,
-  # for a dropped node or not.
+  # than the max age, or 2) the target node has been dropped from the cluster.
+  # Data is never dropped until it has reached max-age however, for a dropped
+  # node or not.
   - purge-interval = "1h"
 
-# Other sections
+# Config other sections
 influxdb_config_other:
   # Once every 24 hours InfluxDB will report anonymous data to m.influxdb.com
   # The data includes raft id (random 8 bytes), os, arch, version, and
@@ -81,24 +79,22 @@ influxdb_config_other:
   - reporting-disabled = false
   # Enterprise registration control
   - section: registration
-    # config:
-    #   - enabled = true
-    #   - url = "https://enterprise.influxdata.com"
-    #   - token = ""
   # Controls non-Raft cluster behavior, which generally includes how data is
   # shared across shards.
   - section: cluster
     config:
-      - shard-writer-timeout = "10s" # The time within which a shard must respond to write.
-      - write-timeout = "5s" # The time within which a write operation must complete on the cluster.
+      # The time within which a shard must respond to write.
+      - shard-writer-timeout = "5s"
+      # The time within which a write operation must complete on the cluster.
+      - write-timeout = "10s"
   # Controls the enforcement of retention policies for evicting old data.
   - section: retention
     config:
       - enabled = true
       - check-interval = "30m"
-  # Controls the precreation of shards, so they are created before data arrives.
-  # Only shards that will exist in the future, at time of creation, are
-  # precreated.
+  # Controls the precreation of shards, so they are created before data
+  # arrives. Only shards that will exist in the future, at time of creation,
+  # are precreated.
   - section: shard-precreation
     config:
       - enabled = true
@@ -107,12 +103,15 @@ influxdb_config_other:
   # Controls the system self-monitoring, statistics and diagnostics.
   - section: monitor
     config:
-      - store-enabled = true # Whether to record statistics internally.
-      - store-database = "_internal" # The destination database for recorded statistics
-      - store-interval = "10s" # The interval at which to record statistics
-  # Controls the availability of the built-in, web-based admin interface. If HTTPS
-  # is enabled for the admin interface, HTTPS must also be enabled on the [http]
-  # service.
+      # Whether to record statistics internally.
+      - store-enabled = true
+      # The destination database for recorded statistics
+      - store-database = "_internal"
+      # The interval at which to record statistics
+      - store-interval = "10s"
+  # Controls the availability of the built-in, web-based admin interface. If
+  # HTTPS is enabled for the admin interface, HTTPS must also be enabled on the
+  # [http] service.
   - section: admin
     config:
       - enabled = true
