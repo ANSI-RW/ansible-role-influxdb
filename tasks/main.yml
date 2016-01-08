@@ -6,8 +6,8 @@
   file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ influxdb_user }}"
-    group: "{{ influxdb_group }}"
+    owner: influxdb
+    group: influxdb
   with_items:
     - "{{ influxdb_config_meta_dir }}"
     - "{{ influxdb_config_data_dir }}"
@@ -25,11 +25,10 @@
 
 - name: Copy InfluxDB config.
   template:
-    src: "{{ influxdb_config_template_path }}"
+    src: influxdb.conf.j2
     dest: "{{ influxdb_config_path }}/influxdb.conf"
     owner: root
     group: root
-    mode: 0644
   notify: restart influxdb
   when: influxdb_config_use_template
 
