@@ -4,8 +4,6 @@ influxdb_version: 0.9.6.1
 
 # Use the included config template.
 influxdb_config_use_template: true
-# Where config files will be stored.
-influxdb_config_path: /etc/influxdb
 # Config [meta] section.
 influxdb_config_meta_dir: /var/lib/influxdb/meta
 # Controls the parameters for the Raft consensus group that stores metadata
