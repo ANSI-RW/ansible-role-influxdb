@@ -1,18 +1,23 @@
-# InfluxDB configuration file.
+# InfluxDB configuration
 
-{% for item in influxdb_config_other %}
-{% if item is not mapping %}
-{{ item }}
-{% endif %}
-{% endfor %}
+reporting-disabled = {{ influxdb_conf_reporting_disabled }}
 
 ###############################################################################
 # META                                                                        #
 ###############################################################################
 
 [meta]
-  dir = "{{ influxdb_config_meta_dir }}"
-{% for item in influxdb_config_meta %}
+  dir = "{{ influxdb_conf_meta_dir }}"
+  hostname = "{{ influxdb_conf_meta_hostname }}"
+  bind-address = "{{ influxdb_conf_meta_bind_address }}"
+  retention-autocreate = {{ influxdb_conf_meta_retention_autocreate }}
+  election-timeout = "{{ influxdb_conf_meta_election_timeout }}"
+  heartbeat-timeout = "{{ influxdb_conf_meta_heartbeat_timeout }}"
+  leader-lease-timeout = "{{ influxdb_conf_meta_leader_lease_timeout }}"
+  commit-timeout = "{{ influxdb_conf_meta_commit_timeout }}"
+  cluster-tracing = {{ influxdb_conf_meta_cluster_tracing }}
+  raft-promotion-enabled = {{ influxdb_conf_meta_raft_promotion_enabled }}
+{% for item in influxdb_conf_meta_other %}
   {{ item }}
 {% endfor %}
 
@@ -21,9 +26,14 @@
 ###############################################################################
 
 [data]
-  dir = "{{ influxdb_config_data_dir }}"
-  wal-dir = "{{ influxdb_config_wal_dir }}"
-{% for item in influxdb_config_data %}
+  dir = "{{ influxdb_conf_data_dir }}"
+  max-wal-size = {{ influxdb_conf_data_max_wal_size }}
+  wal-flush-interval = "{{ influxdb_conf_data_wal_flush_interval }}"
+  wal-partition-flush-delay = "{{ influxdb_conf_data_wal_partition_flush_delay }}"
+  wal-dir = "{{ influxdb_conf_data_wal_dir }}"
+  wal-logging-enabled = {{ influxdb_conf_data_wal_logging_enabled }}
+  data-logging-enabled = {{ influxdb_conf_data_data_logging_enabled }}
+{% for item in influxdb_conf_data_other %}
   {{ item }}
 {% endfor %}
 
@@ -32,23 +42,26 @@
 ###############################################################################
 
 [hinted-handoff]
-  dir = "{{ influxdb_config_hh_dir }}"
-{% for item in influxdb_config_hh %}
+  enabled = {{ influxdb_conf_hh_enabled }}
+  dir = "{{ influxdb_conf_hh_dir }}"
+  max-size = {{ influxdb_conf_hh_max_size }}
+  max-age = "{{ influxdb_conf_hh_max_age }}"
+  retry-rate-limit = {{ influxdb_conf_hh_retry_rate_limit }}
+  retry-interval = "{{ influxdb_conf_hh_retry_interval }}"
+  retry-max-interval = "{{ influxdb_conf_hh_retry_max_interval }}"
+  purge-interval = "{{ influxdb_conf_hh_purge_interval }}"
+{% for item in influxdb_conf_hh_other %}
   {{ item }}
 {% endfor %}
 
 ###############################################################################
-# OTHER SECTIONS                                                              #
+# OTHER                                                                       #
 ###############################################################################
 
-{% for item in influxdb_config_other %}
-{% if item is mapping %}
-[{{ item.section }}]
-{% if item.config is defined %}
-{% for item in item.config %}
+{% for key, value in influxdb_conf_other.iteritems() %}
+[{{ key }}]
+{% for item in value %}
   {{ item }}
 {% endfor %}
-{% endif %}
 
-{% endif %}
 {% endfor %}

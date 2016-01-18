@@ -2,8 +2,27 @@
 - include: setup-RedHat.yml
   when: ansible_os_family == "RedHat"
 
-- include: configure-RedHat.yml
-  when: ansible_os_family == "RedHat"
+- name: ensure influxdb dirs exists
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: influxdb
+    group: influxdb
+  with_items:
+    - "{{ influxdb_conf_meta_dir }}"
+    - "{{ influxdb_conf_data_dir }}"
+    - "{{ influxdb_conf_data_wal_dir }}"
+    - "{{ influxdb_conf_hh_dir }}"
+  when: influxdb_conf_use_template
 
-- name: Start and enable InfluxDB.
+- name: copy influxdb config
+  template:
+    src: influxdb.conf.j2
+    dest: /etc/influxdb/influxdb.conf
+    owner: root
+    group: root
+  notify: restart influxdb
+  when: influxdb_conf_use_template
+
+- name: start and enable influxdb
   service: name=influxdb state=started enabled=yes
