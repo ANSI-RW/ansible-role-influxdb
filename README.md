@@ -161,7 +161,7 @@ None
     - vars/main.yml
 
   roles:
-    - role: rwanyoike.influxdb
+    - role: ansible-role-influxdb
 ```
 
 Inside `vars/main.yml:`
@@ -175,7 +175,3 @@ influxdb_version: 0.9.6.1
 ## License
 
 MIT
-
-## Author Information
-
-- This role was created in 2015 by [Raymond Wanyoike](https://github.com/rwanyoike).
