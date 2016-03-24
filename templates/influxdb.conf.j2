@@ -1,59 +1,117 @@
 # InfluxDB configuration
 
+# Once every 24 hours InfluxDB will report anonymous data to m.influxdb.com.
+# The data includes raft id (random 8 bytes), os, arch, version, and metadata.
+# We don't track ip addresses of servers reporting. This is only used to track
+# the number of instances running and the versions, which is very helpful for
+# us. Change this option to true to disable reporting.
 reporting-disabled = {{ influxdb_conf_reporting_disabled }}
 
 ###############################################################################
 # META                                                                        #
 ###############################################################################
 
+# Controls the parameters for the Raft consensus group that stores metadata
+# about the InfluxDB cluster
 [meta]
+  # Controls if this node should run the metaservice and participate in the
+  # Raft group
+  enabled = {{ influxdb_conf_meta_enabled }}
+
+  # Where the metadata/raft database is stored
   dir = "{{ influxdb_conf_meta_dir }}"
-  hostname = "{{ influxdb_conf_meta_hostname }}"
+
+  # The default address to bind to
   bind-address = "{{ influxdb_conf_meta_bind_address }}"
+
+  # The default address to bind the API to
+  http-bind-address = ":8091"
+  https-enabled = false
+  https-certificate = ""
+
   retention-autocreate = {{ influxdb_conf_meta_retention_autocreate }}
+  # The default election timeout for the store
   election-timeout = "{{ influxdb_conf_meta_election_timeout }}"
+  # The default heartbeat timeout for the store
   heartbeat-timeout = "{{ influxdb_conf_meta_heartbeat_timeout }}"
+  # The default leader lease for the store
   leader-lease-timeout = "{{ influxdb_conf_meta_leader_lease_timeout }}"
+  # The default commit timeout for the store
   commit-timeout = "{{ influxdb_conf_meta_commit_timeout }}"
+  # If trace log messages are printed for the meta service
   cluster-tracing = {{ influxdb_conf_meta_cluster_tracing }}
+  # The default for auto promoting a node to a raft node when needed
   raft-promotion-enabled = {{ influxdb_conf_meta_raft_promotion_enabled }}
+  # If log messages are printed for the meta service
+  logging-enabled = {{ influxdb_conf_meta_logging_enabled }}
+  pprof-enabled = {{ influxdb_conf_meta_pprof_enabled }}
+  # The default duration for leases
+  lease-duration = "{{ influxdb_conf_meta_lease_duration }}"
+
 {% for item in influxdb_conf_meta_other %}
   {{ item }}
-{% endfor %}
+{% if loop.last %}
 
+{% endif %}
+{% endfor %}
 ###############################################################################
 # DATA                                                                        #
 ###############################################################################
 
+# Controls where the actual shard data for InfluxDB lives and how it is flushed
+# from the WAL. "dir" may need to be changed to a suitable place for your
+# system, but the WAL settings are an advanced configuration. The defaults
+# should work for most systems
 [data]
+  # Controls if this node holds time series data shards in the cluster
+  enabled = {{ influxdb_conf_data_enabled }}
+
   dir = "{{ influxdb_conf_data_dir }}"
-  max-wal-size = {{ influxdb_conf_data_max_wal_size }}
-  wal-flush-interval = "{{ influxdb_conf_data_wal_flush_interval }}"
-  wal-partition-flush-delay = "{{ influxdb_conf_data_wal_partition_flush_delay }}"
+
+  # These are the WAL settings for the storage engine >= 0.9.3
   wal-dir = "{{ influxdb_conf_data_wal_dir }}"
   wal-logging-enabled = {{ influxdb_conf_data_wal_logging_enabled }}
   data-logging-enabled = {{ influxdb_conf_data_data_logging_enabled }}
+
 {% for item in influxdb_conf_data_other %}
   {{ item }}
-{% endfor %}
+{% if loop.last %}
 
+{% endif %}
+{% endfor %}
 ###############################################################################
 # HINTED-HANDOFF                                                              #
 ###############################################################################
 
+# Controls the hinted handoff feature, which allows nodes to temporarily store
+# queued data when one node of a cluster is down for a short period of time
 [hinted-handoff]
   enabled = {{ influxdb_conf_hh_enabled }}
   dir = "{{ influxdb_conf_hh_dir }}"
   max-size = {{ influxdb_conf_hh_max_size }}
   max-age = "{{ influxdb_conf_hh_max_age }}"
   retry-rate-limit = {{ influxdb_conf_hh_retry_rate_limit }}
+
+  # Hinted handoff will start retrying writes to down nodes at a rate of once
+  # per second. If any error occurs, it will backoff in an exponential manner,
+  # until the interval reaches retry-max-interval. Once writes to all nodes are
+  # successfully completed the interval will reset to retry-interval.
   retry-interval = "{{ influxdb_conf_hh_retry_interval }}"
   retry-max-interval = "{{ influxdb_conf_hh_retry_max_interval }}"
+
+  # Interval between running checks for data that should be purged. Data is
+  # purged from hinted-handoff queues for two reasons. 1) The data is older
+  # than the max age, or 2) the target node has been dropped from the cluster.
+  # Data is never dropped until it has reached max-age however, for a dropped
+  # node or not.
   purge-interval = "{{ influxdb_conf_hh_purge_interval }}"
+
 {% for item in influxdb_conf_hh_other %}
   {{ item }}
-{% endfor %}
+{% if loop.last %}
 
+{% endif %}
+{% endfor %}
 ###############################################################################
 # OTHER                                                                       #
 ###############################################################################
