@@ -1,6 +1,6 @@
 # Ansible Role: InfluxDB
 
-[![Build Status](https://img.shields.io/travis/rwanyoike/ansible-role-influxdb.svg)](https://travis-ci.org/rwanyoike/ansible-role-influxdb) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/rwanyoike/ansible-role-influxdb/master/LICENSE)
+[![Build Status](https://img.shields.io/travis/ANSI-RW/ansible-role-influxdb.svg)](https://travis-ci.org/ANSI-RW/ansible-role-influxdb) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ANSI-RW/ansible-role-influxdb/master/LICENSE)
 
 Installs and configures InfluxDB on RHEL/CentOS or Debian/Ubuntu.
 
@@ -117,7 +117,7 @@ None
     - vars/main.yml
 
   roles:
-    - role: ansible-role-influxdb
+    - { role: ANSI-RW.influxdb }
 ```
 
 Inside `vars/main.yml`:
