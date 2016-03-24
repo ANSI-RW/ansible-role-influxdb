@@ -5,4 +5,4 @@
     dest: /tmp/influxdb-{{ influxdb_version }}-1.x86_64.rpm
 
 - name: install influxdb
-  yum: name=/tmp/influxdb-{{ influxdb_version }}-1.x86_64.rpm state=present
+  package: name=/tmp/influxdb-{{ influxdb_version }}-1.x86_64.rpm state=present
