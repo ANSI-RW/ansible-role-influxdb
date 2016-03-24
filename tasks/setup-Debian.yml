@@ -1,0 +1,9 @@
+---
+- name: download influxdb package
+  get_url:
+    url: https://s3.amazonaws.com/influxdb/influxdb_{{ influxdb_version }}-1_amd64.deb
+    dest: /tmp/influxdb_{{ influxdb_version }}-1_amd64.deb
+
+- name: install influxdb
+  apt: deb=/tmp/influxdb_{{ influxdb_version }}-1_amd64.deb state=present
+

@@ -2,7 +2,7 @@
 
 [![Build Status](https://img.shields.io/travis/rwanyoike/ansible-role-influxdb.svg)](https://travis-ci.org/rwanyoike/ansible-role-influxdb) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/rwanyoike/ansible-role-influxdb/master/LICENSE)
 
-Installs and configures InfluxDB on RHEL/CentOS ~~or Debian/Ubuntu~~.
+Installs and configures InfluxDB on RHEL/CentOS or Debian/Ubuntu.
 
 ## Requirements
 
