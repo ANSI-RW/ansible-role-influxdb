@@ -22,7 +22,7 @@ influxdb_conf_meta_raft_promotion_enabled: "true"
 influxdb_conf_meta_logging_enabled: "true"
 influxdb_conf_meta_pprof_enabled: "false"
 influxdb_conf_meta_lease_duration: 1m0s
-# Other [meta] configuration
+# Other [meta] config
 influxdb_conf_meta_other: []
 
 influxdb_conf_data_enabled: "true"
@@ -30,7 +30,7 @@ influxdb_conf_data_dir: /var/lib/influxdb/data
 influxdb_conf_data_wal_dir: /var/lib/influxdb/wal
 influxdb_conf_data_wal_logging_enabled: "true"
 influxdb_conf_data_data_logging_enabled: "true"
-# Other [data] configuration
+# Other [data] config
 influxdb_conf_data_other: []
 
 influxdb_conf_hh_enabled: "true"
@@ -41,10 +41,10 @@ influxdb_conf_hh_retry_rate_limit: 0
 influxdb_conf_hh_retry_interval: 1s
 influxdb_conf_hh_retry_max_interval: 1m
 influxdb_conf_hh_purge_interval: 1h
-# Other [hinted-handoff] configuration
+# Other [hinted-handoff] config
 influxdb_conf_hh_other: []
 
-# Other configuration
+# Other section config
 influxdb_conf_other:
   cluster:
     - shard-writer-timeout = "5s"
