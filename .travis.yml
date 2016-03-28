@@ -12,7 +12,7 @@ env:
 
 before_install:
   # Build Dockerfile image
-  - docker build -q --rm=true -f tests/Dockerfile.redhat -t redhat:ansible tests/
+  - docker build --rm=true -f tests/Dockerfile.redhat -t redhat:ansible tests/
 
   # Run container in detached state
   - docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v /tmp/$(mktemp -d):/run -p 22 redhat:ansible > "${CONTAINER_ID}"
