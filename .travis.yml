@@ -8,16 +8,16 @@ services:
   - docker
 
 env:
-  - OS_FAMILY: redhat
-    RUN_OPTS: "\"-v /sys/fs/cgroup:/sys/fs/cgroup:ro\""
-    CONTAINER_ID: $(mktemp)
-    PORT_MAPPING: $(mktemp)
-    SITE: test.yml
-  - OS_FAMILY: debian
-    RUN_OPTS: "\"-v /sys/fs/cgroup:/sys/fs/cgroup:ro\""
-    CONTAINER_ID: $(mktemp)
-    PORT_MAPPING: $(mktemp)
-    SITE: test.yml
+  global:
+    - CONTAINER_ID: $(mktemp)
+    - PORT_MAPPING: $(mktemp)
+  matrix:
+    - OS_FAMILY: redhat
+      RUN_OPTS: "\"-v /sys/fs/cgroup:/sys/fs/cgroup:ro\""
+      SITE: test.yml
+    - OS_FAMILY: debian
+      RUN_OPTS: "\"-v /sys/fs/cgroup:/sys/fs/cgroup:ro\""
+      SITE: test.yml
 
 before_install:
   # Generate local ssh key
@@ -33,6 +33,8 @@ before_install:
 
   # Authenticate ssh host
   - ssh-keyscan -Hp "$(cat ${PORT_MAPPING} | cut -d ':' -f 2 )" "$(cat ${PORT_MAPPING} | cut -d ':' -f 1 )" > ~/.ssh/known_hosts
+  - docker exec "$(cat ${CONTAINER_ID})" ps aux
+  - echo "$(cat ${PORT_MAPPING})"
 
 install:
   # pip install ansible 2.x
