@@ -8,9 +8,7 @@ services:
   - docker
 
 env:
-  - CONTAINER_ID=$(mktemp)
-  - PORT_MAPPING=$(mktemp)
-  - SITE=test.yml
+  - CONTAINER_ID=$(mktemp) PORT_MAPPING=$(mktemp) SITE=test.yml
 
 before_install:
   # Build Dockerfile image
