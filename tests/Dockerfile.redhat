@@ -2,7 +2,7 @@
 FROM centos:7
 
 # Systemd integration
-ENV container docker
+ENV CONTAINER docker
 
 # Systemd integration
 RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
