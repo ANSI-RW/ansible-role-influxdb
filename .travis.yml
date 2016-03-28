@@ -1,30 +1,56 @@
 ---
+sudo: required
+
 language: python
 python: "2.7"
 
+services:
+  - docker
+
 env:
+  - CONTAINER_ID=$(mktemp)
+  - PORT_MAPPING=$(mktemp)
   - SITE=test.yml
 
 before_install:
-  - sudo apt-get update -qq
+  # Build Dockerfile image
+  - docker build -q --rm=true -f tests/Dockerfile.redhat -t redhat:ansible tests/
+
+  # Run container in detached state
+  - docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v /tmp/$(mktemp -d):/run -p 22 redhat:ansible > "${CONTAINER_ID}"
+  - docker port "$(cat ${CONTAINER_ID})" 22 > "${PORT_MAPPING}"
+
+  # Generate local ssh key
+  - ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa
+
+  # Authenticate ssh user/host
+  - docker cp ~/.ssh/id_rsa.pub "$(cat ${CONTAINER_ID})":/root/.ssh/authorized_keys
+  - ssh-keyscan -Hp "$(cat ${PORT_MAPPING} | cut -d ':' -f 2 )" "$(cat ${PORT_MAPPING} | cut -d ':' -f 1 )" > ~/.ssh/known_hosts
 
 install:
-  # Install Ansible
-  - pip install ansible
+  # pip install ansible 2.x
+  - pip install ansible==2.*
 
   # Add ansible.cfg to pick up roles path
-  - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
+  - "{ echo '[defaults]'; echo 'roles_path = ../'; } > ansible.cfg"
 
 script:
-  # Check the role/playbook's syntax
-  - "ansible-playbook -i tests/inventory tests/$SITE --syntax-check"
+  # Check role/playbook syntax
+  - ansible-playbook -i "$(cat ${PORT_MAPPING})", tests/$SITE --syntax-check
 
-  # Run the role/playbook with ansible-playbook
-  # - "ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo"
+  # Run role/playbook with ansible-playbook
+  - ansible-playbook -i "$(cat ${PORT_MAPPING})", tests/$SITE
 
-  # Run the role/playbook again, checking to make sure it's idempotent
-  # - >
-  #   ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo
-  #   | grep -q "changed=0.*failed=0"
-  #   && (echo "Idempotence test: pass" && exit 0)
-  #   || (echo "Idempotence test: fail" && exit 1)
+  # Run role/playbook again (idempotence)
+  - >
+    ansible-playbook -i "$(cat ${PORT_MAPPING})", tests/$SITE
+    | grep -q "changed=0.*unreachable=0.*failed=0"
+    && (echo "Idempotence test: Pass" && exit 0)
+    || (echo "Idempotence test: Fail" && exit 1)
+
+  # Check influxdb diagnostics
+  - docker exec "$(cat ${CONTAINER_ID})" curl -slI "http://localhost:8086/ping"
+
+notifications:
+  email: false
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
