@@ -8,16 +8,16 @@ services:
   - docker
 
 env:
-  global:
-    - CONTAINER_ID: $(mktemp)
-    - PORT_MAPPING: $(mktemp)
-  matrix:
-    - OS_FAMILY: redhat
-      RUN_OPTS: "'-v /sys/fs/cgroup:/sys/fs/cgroup:ro'"
-      SITE: test.yml
-    - OS_FAMILY: debian
-      RUN_OPTS: "'-v /sys/fs/cgroup:/sys/fs/cgroup:ro'"
-      SITE: test.yml
+  - OS_FAMILY: redhat
+    RUN_OPTS: "\"-v /sys/fs/cgroup:/sys/fs/cgroup:ro\""
+    CONTAINER_ID: $(mktemp)
+    PORT_MAPPING: $(mktemp)
+    SITE: test.yml
+  - OS_FAMILY: debian
+    RUN_OPTS: "\"-v /sys/fs/cgroup:/sys/fs/cgroup:ro\""
+    CONTAINER_ID: $(mktemp)
+    PORT_MAPPING: $(mktemp)
+    SITE: test.yml
 
 before_install:
   # Generate local ssh key
