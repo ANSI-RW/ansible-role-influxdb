@@ -8,21 +8,30 @@ services:
   - docker
 
 env:
-  - CONTAINER_ID=$(mktemp) PORT_MAPPING=$(mktemp) SITE=test.yml
+  global:
+    - CONTAINER_ID: $(mktemp)
+    - PORT_MAPPING: $(mktemp)
+  matrix:
+    - OS_FAMILY: redhat
+      RUN_OPTS: -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v /tmp/$(mktemp -d):/run
+      SITE: test.yml
+    - OS_FAMILY: debian
+      RUN_OPTS: -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v /tmp/$(mktemp -d):/run -v /tmp/$(mktemp -d):/run/lock
+      SITE: test.yml
 
 before_install:
-  # Build Dockerfile image
-  - docker build --rm=true -f tests/Dockerfile.redhat -t redhat:ansible tests/
-
-  # Run container in detached state
-  - docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v /tmp/$(mktemp -d):/run -p 22 redhat:ansible > "${CONTAINER_ID}"
-  - docker port "$(cat ${CONTAINER_ID})" 22 > "${PORT_MAPPING}"
-
   # Generate local ssh key
   - ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa
+  - cp ~/.ssh/id_rsa.pub tests/
 
-  # Authenticate ssh user/host
-  - docker cp ~/.ssh/id_rsa.pub "$(cat ${CONTAINER_ID})":/root/.ssh/authorized_keys
+  # Build Dockerfile image
+  - docker build --rm=true -f tests/Dockerfile.${OS_FAMILY} -t ${OS_FAMILY}:ansible tests/
+
+  # Run container in detached state
+  - docker run -d ${RUN_OPTS} -P ${OS_FAMILY}:ansible > "${CONTAINER_ID}"
+  - docker port "$(cat ${CONTAINER_ID})" 22 > "${PORT_MAPPING}"
+
+  # Authenticate ssh host
   - ssh-keyscan -Hp "$(cat ${PORT_MAPPING} | cut -d ':' -f 2 )" "$(cat ${PORT_MAPPING} | cut -d ':' -f 1 )" > ~/.ssh/known_hosts
 
 install:
@@ -46,9 +55,8 @@ script:
     && (echo "Idempotence test: Pass" && exit 0)
     || (echo "Idempotence test: Fail" && exit 1)
 
-  # Check influxdb diagnostics
+  # Ping influxdb service
   - docker exec "$(cat ${CONTAINER_ID})" curl -slI "http://localhost:8086/ping"
 
 notifications:
-  email: false
   webhooks: https://galaxy.ansible.com/api/v1/notifications/

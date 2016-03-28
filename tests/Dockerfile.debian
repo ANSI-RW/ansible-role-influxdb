@@ -1,5 +1,5 @@
-# See https://hub.docker.com/_/centos/
-FROM centos:7
+# See https://hub.docker.com/_/debian/
+FROM debian:jessie
 
 # Systemd integration
 ENV container docker
@@ -14,13 +14,17 @@ rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
 rm -f /lib/systemd/system/basic.target.wants/*; \
 rm -f /lib/systemd/system/anaconda.target.wants/*;
 
+# Update package list
+RUN apt-get -y update; \
 # Install SSH server
-RUN yum -y install openssh-server; \
+apt-get -y install openssh-server; \
 # Remove cached data
-yum -y clean all;
+apt-get -y clean all;
 
+# "Missing privilege separation directory" error
+RUN mkdir /run/sshd; \
 # Create root SSH dir
-RUN mkdir /root/.ssh;
+mkdir /root/.ssh;
 
 # Authenticate ssh user
 ADD id_rsa.pub /root/.ssh/authorized_keys
@@ -32,4 +36,4 @@ EXPOSE 22
 VOLUME ["/sys/fs/cgroup"]
 
 # Systemd integration
-CMD ["/usr/sbin/init"]
+CMD ["/lib/systemd/systemd"]
