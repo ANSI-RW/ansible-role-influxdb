@@ -15,6 +15,8 @@ Available variables are listed below, along with default values (see `defaults/m
 ```yaml
 # Version that should be installed
 influxdb_version: 0.11.0
+# Enable service
+influxdb_enable_service: true
 # Use the included config template
 influxdb_conf_use_template: true
 

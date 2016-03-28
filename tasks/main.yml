@@ -29,3 +29,4 @@
 
 - name: start and enable influxdb
   service: name=influxdb state=started enabled=yes
+  when: influxdb_enable_service

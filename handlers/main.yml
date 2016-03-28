@@ -1,3 +1,4 @@
 ---
 - name: restart influxdb
   service: name=influxdb state=restarted
+  when: influxdb_enable_service
