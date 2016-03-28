@@ -5,7 +5,8 @@ FROM debian:jessie
 ENV CONTAINER docker
 
 # Systemd integration
-RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+RUN (cd /lib/systemd/system/sysinit.target.wants/; \
+for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
 rm -f /lib/systemd/system/multi-user.target.wants/*; \
 rm -f /etc/systemd/system/*.wants/*; \
 rm -f /lib/systemd/system/local-fs.target.wants/*; \
@@ -15,11 +16,11 @@ rm -f /lib/systemd/system/basic.target.wants/*; \
 rm -f /lib/systemd/system/anaconda.target.wants/*;
 
 # Update package list
-RUN apt-get -y update; \
+RUN apt-get update; \
 # Install SSH server
-apt-get -y install --no-install-recommends openssh-server ca-certificates python; \
+apt-get install -y openssh-server ca-certificates python; \
 # Remove cached data
-apt-get -y clean all;
+apt-get clean all;
 
 # "Missing privilege separation directory" error
 RUN mkdir /run/sshd; \
@@ -33,7 +34,7 @@ ADD id_rsa.pub /root/.ssh/authorized_keys
 EXPOSE 22
 
 # Systemd integration
-VOLUME ["/sys/fs/cgroup", "/run", "/run/lock"]
+VOLUME ["/sys/fs/cgroup", "/run"]
 
 # Systemd integration
 CMD ["/lib/systemd/systemd"]
