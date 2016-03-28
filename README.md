@@ -1,14 +1,17 @@
-# Ansible Role: InfluxDB
+Ansible Role: InfluxDB
+======================
 
 [![Build Status](https://img.shields.io/travis/ANSI-RW/ansible-role-influxdb.svg)](https://travis-ci.org/ANSI-RW/ansible-role-influxdb) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ANSI-RW/ansible-role-influxdb/master/LICENSE)
 
 Installs and configures InfluxDB on RHEL/CentOS or Debian/Ubuntu.
 
-## Requirements
+Requirements
+------------
 
 None
 
-## Role Variables
+Role Variables
+--------------
 
 Available variables are listed below, along with default values (see `defaults/main.yml`):
 
@@ -105,11 +108,13 @@ influxdb_conf_other:
 
 Default values for the `influxdb.conf.j2` template are based on the [0.11.0 config](https://github.com/influxdata/influxdb/blob/v0.11.0/etc/config.sample.toml).
 
-## Dependencies
+Dependencies
+------------
 
 None
 
-## Example Playbook
+Example Playbook
+----------------
 
 ```yaml
 - hosts: servers
@@ -132,6 +137,7 @@ influxdb_conf_meta_dir: /mnt/influxdb/meta
 # ... etc ...
 ```
 
-## License
+License
+-------
 
 MIT
