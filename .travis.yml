@@ -29,7 +29,7 @@ before_install:
 
   # Run container in detached state
   - docker run -d ${RUN_OPTS} -P ${OS_FAMILY}:ansible > "${CONTAINER_ID}"
-  # Allow systemd to start
+  # Allow container to start
   - sleep 10
   - docker port "$(cat ${CONTAINER_ID})" 22 > "${PORT_MAPPING}"
 
