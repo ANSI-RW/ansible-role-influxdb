@@ -29,7 +29,7 @@ ADD id_rsa.pub /root/.ssh/authorized_keys
 EXPOSE 22
 
 # Systemd integration
-VOLUME ["/sys/fs/cgroup"]
+VOLUME ["/sys/fs/cgroup", "/run"]
 
 # Systemd integration
 CMD ["/usr/sbin/init"]

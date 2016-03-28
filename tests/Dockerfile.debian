@@ -33,7 +33,7 @@ ADD id_rsa.pub /root/.ssh/authorized_keys
 EXPOSE 22
 
 # Systemd integration
-VOLUME ["/sys/fs/cgroup"]
+VOLUME ["/sys/fs/cgroup", "/run", "/run/lock"]
 
 # Systemd integration
 CMD ["/lib/systemd/systemd"]

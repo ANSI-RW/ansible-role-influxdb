@@ -13,10 +13,10 @@ env:
     - PORT_MAPPING: $(mktemp)
   matrix:
     - OS_FAMILY: redhat
-      RUN_OPTS: -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v /tmp/$(mktemp -d):/run
+      RUN_OPTS: -v /sys/fs/cgroup:/sys/fs/cgroup:ro
       SITE: test.yml
     - OS_FAMILY: debian
-      RUN_OPTS: -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v /tmp/$(mktemp -d):/run -v /tmp/$(mktemp -d):/run/lock
+      RUN_OPTS: -v /sys/fs/cgroup:/sys/fs/cgroup:ro
       SITE: test.yml
 
 before_install:
