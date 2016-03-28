@@ -17,7 +17,7 @@ rm -f /lib/systemd/system/anaconda.target.wants/*;
 # Update package list
 RUN apt-get -y update; \
 # Install SSH server
-apt-get -y install --no-install-recommends openssh-server ca-certificates python curl; \
+apt-get -y install --no-install-recommends openssh-server ca-certificates python; \
 # Remove cached data
 apt-get -y clean all;
 

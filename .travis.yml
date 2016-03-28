@@ -29,12 +29,12 @@ before_install:
 
   # Run container in detached state
   - docker run -d ${RUN_OPTS} -P ${OS_FAMILY}:ansible > "${CONTAINER_ID}"
+  # Allow systemd to start
+  - sleep 10
   - docker port "$(cat ${CONTAINER_ID})" 22 > "${PORT_MAPPING}"
 
   # Authenticate ssh host
   - ssh-keyscan -Hp "$(cat ${PORT_MAPPING} | cut -d ':' -f 2 )" "$(cat ${PORT_MAPPING} | cut -d ':' -f 1 )" > ~/.ssh/known_hosts
-  - docker exec "$(cat ${CONTAINER_ID})" ps aux
-  - echo "$(cat ${PORT_MAPPING})"
 
 install:
   # pip install ansible 2.x
@@ -57,8 +57,8 @@ script:
     && (echo "Idempotence test: Pass" && exit 0)
     || (echo "Idempotence test: Fail" && exit 1)
 
-  # Ping influxdb service
-  - docker exec "$(cat ${CONTAINER_ID})" curl -slI "http://localhost:8086/ping"
+  # Check influxdb version
+  - docker exec "$(cat ${CONTAINER_ID})" influx --version
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
